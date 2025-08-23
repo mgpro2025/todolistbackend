@@ -6,6 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.todolist.api.dto.CreateTaskRequest;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.security.Principal; // Importar Principal
 import java.util.List;
@@ -28,5 +31,12 @@ public class TaskController {
         String userEmail = principal.getName();
         List<TaskDto> tasks = taskService.getTasksForUser(userEmail);
         return ResponseEntity.ok(tasks);
+    }
+
+    @PostMapping
+    public ResponseEntity<TaskDto> createTask(@RequestBody CreateTaskRequest request, Principal principal) {
+        String userEmail = principal.getName();
+        TaskDto createdTask = taskService.createTask(request.getTitle(), userEmail);
+        return ResponseEntity.ok(createdTask);
     }
 }

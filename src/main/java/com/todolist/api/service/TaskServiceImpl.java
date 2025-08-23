@@ -5,6 +5,8 @@ import com.todolist.api.entity.User;
 import com.todolist.api.repository.TaskRepository;
 import com.todolist.api.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import com.todolist.api.entity.Task;
+import java.time.Instant;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,5 +44,25 @@ public class TaskServiceImpl implements TaskService {
         taskDto.setCreatedAt(task.getCreatedAt());
         taskDto.setCompletedAt(task.getCompletedAt());
         return taskDto;
+    }
+
+    @Override
+    public TaskDto createTask(String title, String userEmail) {
+        // Buscamos al usuario para asociar la tarea
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // Creamos la nueva entidad Task
+        Task newTask = new Task();
+        newTask.setTitle(title);
+        newTask.setCompleted(false);
+        newTask.setCreatedAt(Instant.now()); // La fecha de creación es ahora
+        newTask.setUser(user); // Asociamos la tarea al usuario
+
+        // Guardamos la nueva tarea en la base de datos
+        Task savedTask = taskRepository.save(newTask);
+
+        // Convertimos la tarea guardada a DTO y la devolvemos
+        return convertToDto(savedTask);
     }
 }

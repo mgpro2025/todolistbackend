@@ -5,4 +5,5 @@ import java.util.List;
 
 public interface TaskService {
     List<TaskDto> getTasksForUser(String userEmail);
+    TaskDto createTask(String title, String userEmail);
 }
