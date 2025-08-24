@@ -9,6 +9,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.todolist.api.dto.CreateTaskRequest;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import com.todolist.api.dto.UpdateTaskTitleRequest;
 
 import java.security.Principal; // Importar Principal
 import java.util.List;
@@ -38,5 +43,35 @@ public class TaskController {
         String userEmail = principal.getName();
         TaskDto createdTask = taskService.createTask(request.getTitle(), userEmail);
         return ResponseEntity.ok(createdTask);
+    }
+
+    @DeleteMapping("/{taskId}")
+    public ResponseEntity<Void> deleteTask(@PathVariable Long taskId, Principal principal) {
+        String userEmail = principal.getName();
+        taskService.deleteTask(taskId, userEmail);
+        // Devolvemos una respuesta 204 No Content, que es el estándar para un DELETE exitoso
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{taskId}")
+    public ResponseEntity<TaskDto> updateTask(
+            @PathVariable Long taskId,
+            @RequestParam boolean completed,
+            Principal principal) {
+
+        String userEmail = principal.getName();
+        TaskDto updatedTask = taskService.updateTaskCompletion(taskId, completed, userEmail);
+        return ResponseEntity.ok(updatedTask);
+    }
+
+    @PutMapping("/{taskId}/title")
+    public ResponseEntity<TaskDto> updateTaskTitle(
+            @PathVariable Long taskId,
+            @RequestBody UpdateTaskTitleRequest request,
+            Principal principal) {
+
+        String userEmail = principal.getName();
+        TaskDto updatedTask = taskService.updateTaskTitle(taskId, request.getTitle(), userEmail);
+        return ResponseEntity.ok(updatedTask);
     }
 }

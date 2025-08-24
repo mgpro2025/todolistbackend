@@ -65,4 +65,60 @@ public class TaskServiceImpl implements TaskService {
         // Convertimos la tarea guardada a DTO y la devolvemos
         return convertToDto(savedTask);
     }
+
+    @Override
+    public void deleteTask(Long taskId, String userEmail) {
+        // 1. Buscamos la tarea por su ID
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Tarea no encontrada"));
+
+        // 2. Comprobación de seguridad: verificamos que la tarea pertenece al usuario autenticado
+        if (!task.getUser().getEmail().equals(userEmail)) {
+            throw new RuntimeException("Acceso denegado: no tienes permiso para eliminar esta tarea.");
+        }
+
+        // 3. Si todo está en orden, eliminamos la tarea
+        taskRepository.delete(task);
+    }
+
+    @Override
+    public TaskDto updateTaskCompletion(Long taskId, boolean completed, String userEmail) {
+        // 1. Buscamos la tarea
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Tarea no encontrada"));
+
+        // 2. Verificamos que la tarea pertenece al usuario
+        if (!task.getUser().getEmail().equals(userEmail)) {
+            throw new RuntimeException("Acceso denegado");
+        }
+
+        // 3. Actualizamos el estado y la fecha de término
+        task.setCompleted(completed);
+        if (completed) {
+            task.setCompletedAt(Instant.now()); // Si se completa, se guarda la fecha
+        } else {
+            task.setCompletedAt(null); // Si se desmarca, se borra la fecha
+        }
+
+        // 4. Guardamos los cambios en la base de datos
+        Task updatedTask = taskRepository.save(task);
+
+        // 5. Devolvemos la tarea actualizada
+        return convertToDto(updatedTask);
+    }
+
+    @Override
+    public TaskDto updateTaskTitle(Long taskId, String newTitle, String userEmail) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Tarea no encontrada"));
+
+        if (!task.getUser().getEmail().equals(userEmail)) {
+            throw new RuntimeException("Acceso denegado");
+        }
+
+        task.setTitle(newTitle);
+        Task updatedTask = taskRepository.save(task);
+
+        return convertToDto(updatedTask);
+    }
 }
