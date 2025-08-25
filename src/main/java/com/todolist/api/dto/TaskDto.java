@@ -2,6 +2,8 @@ package com.todolist.api.dto;
 
 import lombok.Data;
 import java.time.Instant;
+import java.time.LocalDate;
+
 
 @Data
 public class TaskDto {
@@ -10,4 +12,5 @@ public class TaskDto {
     private boolean completed;
     private Instant createdAt;
     private Instant completedAt;
+    private LocalDate dueDate;
 }

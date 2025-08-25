@@ -7,6 +7,7 @@ import com.todolist.api.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import com.todolist.api.entity.Task;
 import java.time.Instant;
+import com.todolist.api.dto.CreateTaskRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,26 +44,23 @@ public class TaskServiceImpl implements TaskService {
         taskDto.setCompleted(task.isCompleted());
         taskDto.setCreatedAt(task.getCreatedAt());
         taskDto.setCompletedAt(task.getCompletedAt());
+        taskDto.setDueDate(task.getDueDate());
         return taskDto;
     }
 
     @Override
-    public TaskDto createTask(String title, String userEmail) {
-        // Buscamos al usuario para asociar la tarea
+    public TaskDto createTask(CreateTaskRequest request, String userEmail) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // Creamos la nueva entidad Task
         Task newTask = new Task();
-        newTask.setTitle(title);
+        newTask.setTitle(request.getTitle());
+        newTask.setDueDate(request.getDueDate()); // Asigna la fecha de vencimiento
         newTask.setCompleted(false);
-        newTask.setCreatedAt(Instant.now()); // La fecha de creación es ahora
-        newTask.setUser(user); // Asociamos la tarea al usuario
+        newTask.setCreatedAt(Instant.now());
+        newTask.setUser(user);
 
-        // Guardamos la nueva tarea en la base de datos
         Task savedTask = taskRepository.save(newTask);
-
-        // Convertimos la tarea guardada a DTO y la devolvemos
         return convertToDto(savedTask);
     }
 

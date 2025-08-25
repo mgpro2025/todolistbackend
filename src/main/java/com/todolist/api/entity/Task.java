@@ -3,6 +3,7 @@ package com.todolist.api.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.Instant;
+import java.time.LocalDate;
 
 @Data
 @Entity
@@ -26,4 +27,6 @@ public class Task {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    private LocalDate dueDate;
 }
