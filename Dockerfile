@@ -9,6 +9,8 @@ WORKDIR /app
 COPY .mvn/ .mvn/
 COPY mvnw pom.xml ./
 
+RUN chmod +x mvnw
+
 # Descargamos las dependencias (esto se cachea para builds más rápidas)
 RUN ./mvnw dependency:go-offline
 
